@@ -4,6 +4,12 @@
 
 ## Description
 
+This application has been created as a budget tracker, allowing user to create and track daily income and expenses. Users are able to log transactions or income on a given day, whether or not they are connected to the internet or not. This is especially useful for when users are travelling. Users can input the name of the transaction, the transaction amount and add or subract these inputs. A chart is there to show the user their spending habits over time.
+
+MongoDB has been used for the database and the application has been deployed on Heroku.
+
+Link to the Heroku application for "Budget Tracker": [view app](https://shelby-budget-tracker.herokuapp.com/).
+
 ## Table of Contents
 
 - [Installation](#installation)
@@ -39,26 +45,6 @@ This project is licensed by the [MIT](https://opensource.org/licenses/MIT) licen
 If this project is of interest to you, please contact me with a detailed description of how you would like to contribute prior to any pull requests.
 
 ## Credits
-
-http://expressjs.com/en/api.html
-
-https://www.npmjs.com/package/nodemon
-
-https://www.npmjs.com/package/express-session
-
-https://www.npmjs.com/package/dotenv
-
-https://www.npmjs.com/package/connect-session-sequelize
-
-https://www.mongodb.com/
-
-https://devcenter.heroku.com/categories/reference
-
-https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/
-
-https://docs.mongodb.com/manual/reference/operator/aggregation/sum/
-
-https://mongoosejs.com/docs/api.html#aggregate_Aggregate
 
 https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
 
