@@ -36,6 +36,9 @@ npm install
 
 Once the files have been pull down to your preferred repository, run this application by inputting 'npm start' into your bash terminal. The server will start. You can then view the application in the default browser.
 
+![Final result appears as:](./public/img/budgettracker1.png)
+![Final result appears as:](./public/img/budgettracker2.png)
+
 ## License
 
 This project is licensed by the [MIT](https://opensource.org/licenses/MIT) license
