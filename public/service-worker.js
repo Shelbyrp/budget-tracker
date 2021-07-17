@@ -1,78 +1,87 @@
-const STATIC_CACHE = "static-cache-v1";
-const RUNTIME_CACHE = "runtime-cache";
-
-const FILES_TO_CACHE = [
+const STATIC_FILEPATHS = [
     "/",
-    "/js/db.js",
-    "/index.js",
-    "/manifest.json",
-    "/styles.css",
     "/icons/icon-192x192.png",
     "/icons/icon-512x512.png",
+    "/db.js",
+    "/index.html",
+    "/index.js",
+    "/service-worker.js",
+    "/styles.css",
+    "/manifest.json",
 ];
+const STATIC_CACHE_KEY = "static-cache-v1";
+const RUNTIME_CACHE_KEY = "runtime-cache-v1";
 
-self.addEventListener("install", event => {
-    event.waitUntil(
-        caches
-            .open(STATIC_CACHE)
-            .then(cache => cache.addAll(FILES_TO_CACHE))
-            .then(() => self.skipWaiting())
-    );
-});
-
-self.addEventListener("activate", event => {
-    const currentCaches = [STATIC_CACHE, RUNTIME_CACHE];
-    event.waitUntil(
-        caches
-            .keys()
-            .then(cacheNames => {
-                return cacheNames.filter(
-                    cacheName => !currentCaches.includes(cacheName)
-                );
-            })
-            .then(cachesToDelete => {
-                return Promise.all(
-                    cachesToDelete.map(cacheToDelete => {
-                        return caches.delete(cacheToDelete);
-                    })
-                );
-            })
-            .then(() => self.clients.claim())
-    );
-});
-
-self.addEventListener("fetch", function (event) {
-    if (event.request.url.includes("/api/")) {
-        event.respondWith(
-            caches
-                .open(DATA_CACHE_NAME)
-                .then((cache) => {
-                    return fetch(event.request)
-                        .then((response) => {
-                            if (response.status === 200) {
-                                cache.put(event.request.url, response.clone());
-                            }
-                            return response;
-                        })
-                        .catch((err) => {
-                            return cache.match(event.request);
-                        });
-                })
-                .catch((err) => console.log(err))
-        );
-
-        return;
+self.oninstall = event => event.waitUntil(install());
+self.onactivate = event => event.waitUntil(activate());
+self.onfetch = event => {
+    if (event.request.method === "GET") {
+        event.respondWith(progressiveFetch(event.request));
     }
+};
 
-    event.respondWith(
-        fetch(event.request).catch(function () {
-            return caches.match(event.request).then(function (response) {
-                if (response) {
-                    return response;
-                } else if (event.request.headers.get("accept").includes("text/html")) {
-                    return caches.match("/");
-                }
-            });
-        })
-    );
-});
+async function install() {
+    try {
+        const staticCache = await caches.open(STATIC_CACHE_KEY);
+        await staticCache.addAll(STATIC_FILEPATHS);
+        self.skipWaiting();
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function activate() {
+    try {
+        const keyList = await caches.keys();
+        for (const key of keyList) {
+            if (key !== STATIC_CACHE_KEY && key !== RUNTIME_CACHE_KEY) {
+                await caches.delete(key);
+            }
+        }
+        self.clients.claim();
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function progressiveFetch(request) {
+    try {
+        return request.url.includes("/api/")
+            ? await getRuntimeResource(request)
+            : await getStaticResource(request);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function getRuntimeResource(request) {
+    try {
+        const response = await fetch(request);
+        if (response.status === 200) {
+            const runtimeCache = await caches.open(RUNTIME_CACHE_KEY);
+            runtimeCache.put(request.url, response.clone());
+        }
+        return response;
+    } catch (_err) {
+        return await getCachedRuntimeResource(request);
+    }
+}
+
+async function getCachedRuntimeResource(request) {
+    try {
+        const runtimeCache = await caches.open(RUNTIME_CACHE_KEY);
+        return await runtimeCache.match(request);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function getStaticResource(request) {
+    try {
+        const staticCache = await caches.open(STATIC_CACHE_KEY);
+        const response = await staticCache.match(request);
+        return response || fetch(request);
+    } catch (err) {
+        console.log(err);
+    }
+}
