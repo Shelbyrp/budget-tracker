@@ -24,20 +24,20 @@ request.onerror = function (event) {
 //Execute the below if there is an attempt to submit a new transaction with no internet connection
 function saveRecord(record) {
     const transaction = db.transaction(['new_transaction'], 'readwrite');
-    const budgetObjectStore = transaction.objectStore('new_transaction');
-    budgetObjectStore.add(record);
+    const budgetTrackerObjectStore = transaction.objectStore('new_transaction');
+    budgetTrackerObjectStore.add(record);
 };
 
 //Creates a new transaction, gets all transactions which are assigned to getAll and sends it to the api 
 function uploadTransaction() {
     const transaction = db.transaction(['new_transaction'], 'readwrite');
-    const budgetObjectStore = transaction.objectStore('new_transaction');
-    const getAll = budgetObjectStore.getAll();
-    getAll.onsuccess = function () {
-        if (getAll.result.length > 0) {
+    const budgetTrackerObjectStore = transaction.objectStore('new_transaction');
+    const getAllTransactions = budgetTrackerObjectStore.getAll();
+    getAllTransactions.onsuccess = function () {
+        if (getAllTransactions.result.length > 0) {
             fetch('/api/transaction', {
                 method: 'POST',
-                body: JSON.stringify(getAll.result),
+                body: JSON.stringify(getAllTransactions.result),
                 headers: {
                     Accept: 'application/json, text/plain, */*',
                     'Content-Type': 'application/json'
@@ -49,8 +49,8 @@ function uploadTransaction() {
                         throw new Error(serverResponse);
                     }
                     const transaction = db.transaction(['new_transaction'], 'readwrite');
-                    const budgetObjectStore = transaction.objectStore('new_transaction');
-                    budgetObjectStore.clear();
+                    const budgetTrackerObjectStore = transaction.objectStore('new_transaction');
+                    budgetTrackerObjectStore.clear();
                     alert('All saved transactions have been recorded');
                 })
                 .catch(err => {
