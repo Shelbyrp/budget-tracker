@@ -51,6 +51,8 @@ If this project is of interest to you, please contact me with a detailed descrip
 
 https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
 
+https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
+
 ## Tests
 
 There are currently no tests for this application.
