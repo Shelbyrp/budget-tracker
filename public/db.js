@@ -8,6 +8,7 @@ request.onupgradeneeded = function (e) {
     db.createObjectStore('new_transaction', { autoIncrement: true });
 };
 
+// upload a transaction if request is successful
 request.onsuccess = function (e) {
     db = e.target.result;
     if (navigator.onLine) {
@@ -15,16 +16,19 @@ request.onsuccess = function (e) {
     }
 };
 
+//send error if request has issues
 request.onerror = function (event) {
     console.log("There was an error:", event.target.errorCode);
 };
 
+//Execute the below if there is an attempt to submit a new transaction with no internet connection
 function saveRecord(record) {
     const transaction = db.transaction(['new_transaction'], 'readwrite');
     const budgetObjectStore = transaction.objectStore('new_transaction');
     budgetObjectStore.add(record);
 };
 
+//Creates a new transaction, gets all transactions which are assigned to getAll and sends it to the api 
 function uploadTransaction() {
     const transaction = db.transaction(['new_transaction'], 'readwrite');
     const budgetObjectStore = transaction.objectStore('new_transaction');
@@ -47,7 +51,7 @@ function uploadTransaction() {
                     const transaction = db.transaction(['new_transaction'], 'readwrite');
                     const budgetObjectStore = transaction.objectStore('new_transaction');
                     budgetObjectStore.clear();
-                    alert('All saved transactions have been recorded!');
+                    alert('All saved transactions have been recorded');
                 })
                 .catch(err => {
                     console.log(err);
@@ -56,4 +60,5 @@ function uploadTransaction() {
     }
 };
 
+//When there is internet, all offline transactions will be uploaded
 window.addEventListener('online', uploadTransaction);
